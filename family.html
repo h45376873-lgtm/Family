@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Family</title>
+    <!-- Google Fonts untuk tampilan teks modern dan nyaman dibaca -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #3e2723 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            color: #f8fafc;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Container dengan ukuran sedang */
+        .container {
+            background-color: #2a1f1d;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #4a3b32;
+            z-index: 10;
+            position: relative;
+        }
+
+        h1 {
+            color: #e2e8f0;
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            color: #e2e8f0;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0 0 12px 0;
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            border: 1.5px solid #3b6989;
+            border-radius: 8px;
+            font-size: 13px;
+            background-color: #1e293b;
+            color: #f8fafc;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="password"]:focus, input[type="text"]:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #3b6989 0%, #2563eb 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .list-box {
+            text-align: left;
+            background-color: #1e293b;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 12px;
+            border-left: 3px solid #3b6989;
+            line-height: 1.6;
+            color: #d1c2b5;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        /* Spinner Loading */
+        .spinner {
+            margin: 15px auto;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #4a3b32;
+            border-top: 3px solid #60a5fa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Grid Game 4x4 */
+        .grid-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background-color: #1e293b;
+            border: 1px solid #3b6989;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .card.flipped, .card.matched {
+            background-color: #3e2723;
+            border-color: #8c6d58;
+        }
+
+        /* Animasi Hati Jatuh */
+        .heart {
+            position: fixed;
+            top: -20px;
+            font-size: 18px;
+            color: #f43f5e;
+            animation: fall linear forwards;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HALAMAN LOGIN -->
+    <div class="container page active" id="p-login">
+        <h1>Welcome to Family</h1>
+        <input type="password" id="pw-input" placeholder="Masukkan password...">
+        <div id="err-pw" class="error-msg">Password salah!</div>
+        <button onclick="checkPw()">Verifikasi</button>
+        <p style="font-size: 12px; color: #a1a1aa; margin-top: 5px;">mauu pw? Ke harzz ganteng</p>
+    </div>
+
+    <!-- 2. HALAMAN WAIT/LOADING -->
+    <div class="container page" id="p-wait">
+        <h1>Wait!!</h1>
+        <div class="spinner"></div>
+        <p>Mohon tunggu sebentar...</p>
+    </div>
+
+    <!-- 3. HALAMAN NAMA LENGKAP -->
+    <div class="container page" id="p-nama">
+        <h2>Isi nama lengkap kamu:</h2>
+        <input type="text" id="nama-input" placeholder="Ketik nama lengkap...">
+        <div id="err-nama" class="error-msg">Nama tidak ada di daftar keluarga!</div>
+        <button onclick="checkNama()">Verifikasi</button>
+        
+        <div class="list-box">
+            <strong style="color: #60a5fa;">List nama keluarga:</strong><br>
+            • Miswono (bapak)<br>
+            • Susi Erlina (ibu)<br>
+            • Hanifah eka Suswono (anak ke 1)<br>
+            • Fahar abdi suswono (anak ke 2)
+        </div>
+    </div>
+
+    <!-- 4. HALAMAN PERTANYAAN -->
+    <div class="container page" id="p-quiz">
+        <h2 id="q-title">Pertanyaan</h2>
+        <p id="q-text" style="font-size: 14px; font-weight: 500; color: #f8fafc;"></p>
+        <input type="text" id="q-input" placeholder="Ketik jawaban...">
+        <div id="err-q" class="error-msg">Jawaban salah, coba lagi!</div>
+        <button onclick="checkAnswer()">Jawab</button>
+    </div>
+
+    <!-- 5. HALAMAN GAME PUZZLE 4x4 -->
+    <div class="container page" id="p-game">
+        <h2>Tebak-Tebakkan Gambar</h2>
+        <p>Cocokkan semua pasangan buah yang sama (4x4):</p>
+        <div class="grid-game" id="grid"></div>
+    </div>
+
+    <!-- 6. HALAMAN AKHIR (PENYEMANGAT PANJANG SEDANG) -->
+    <div class="container page" id="p-final">
+        <h1>Halo <span id="user-name-display" style="color: #60a5fa;"></span>! ❤️</h1>
+        <p style="font-size: 13px; margin-top: 15px; line-height: 1.7; color: #e2e8f0; text-align: center;">
+            Terima kasih ya sudah meluangkan waktu untuk menyelesaikan ini! Kamu adalah bagian yang sangat berharga dan penyemangat utama di dalam keluarga ini. Tetaplah tersenyum, jaga kesehatan, dan jangan pernah lelah untuk saling menyayangi. Apapun tantangan yang dihadapi, ingatlah bahwa kita akan selalu saling mendukung satu sama lain. Tetap semangat dan selalu bahagia ya! ✨🥰
+        </p>
+    </div>
+
+    <script>
+        let currentUser = "";
+        let userRole = ""; 
+        let currentQIndex = 0;
+        let activeQuestions = [];
+
+        const questionsOrtu = [
+            { q: "1. Siapa anak pertama mu?", a: ["hani", "hanifah", "hanifah eka suswono"] },
+            { q: "2. Siapa anak ke dua mu?", a: ["fahar", "fahar abdi suswono"] },
+            { q: "3. Tahun berapa anak ke 1 mu lahir?", a: ["2006"] },
+            { q: "4. Tahun berapa anak ke 2 mu lahir?", a: ["2013"] },
+            { q: "5. Tahun berapa kalian menikah?", a: ["2002"] }
+        ];
+
+        const questionsAnak = [
+            { q: "1. Siapa bapak mu?", a: ["miswono"] },
+            { q: "2. Siapa ibu mu?", a: ["susi erlina", "susi"] },
+            { q: "3. Tahun berapa bapak mu lahir?", a: ["1978"] },
+            { q: "4. Tahun berapa ibu mu lahir?", a: ["1983"] },
+            { q: "5. Tahun berapa ortu mu menikah?", a: ["2002"] }
+        ];
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function waitAndGo(targetPageId, callback) {
+            showPage('p-wait');
+            setTimeout(() => {
+                showPage(targetPageId);
+                if (callback) callback();
+            }, 2000);
+        }
+
+        function checkPw() {
+            const input = document.getElementById('pw-input').value;
+            if (input === 'harzz') {
+                document.getElementById('err-pw').style.display = 'none';
+                waitAndGo('p-nama');
+            } else {
+                document.getElementById('err-pw').style.display = 'block';
+            }
+        }
+
+        function checkNama() {
+            const rawInput = document.getElementById('nama-input').value.trim();
+            const cleanInput = rawInput.toLowerCase();
+
+            if (cleanInput === "miswono" || cleanInput === "susi erlina") {
+                currentUser = rawInput;
+                userRole = "ortu";
+                activeQuestions = questionsOrtu;
+                startQuiz();
+            } else if (cleanInput === "hanifah eka suswono" || cleanInput === "fahar abdi suswono") {
+                currentUser = rawInput;
+                userRole = "anak";
+                activeQuestions = questionsAnak;
+                startQuiz();
+            } else {
+                document.getElementById('err-nama').style.display = 'block';
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('err-nama').style.display = 'none';
+            currentQIndex = 0;
+            waitAndGo('p-quiz', loadQuestion);
+        }
+
+        function loadQuestion() {
+            document.getElementById('err-q').style.display = 'none';
+            document.getElementById('q-input').value = '';
+            document.getElementById('q-title').innerText = `Pertanyaan ${currentQIndex + 1}`;
+            document.getElementById('q-text').innerText = activeQuestions[currentQIndex].q;
+        }
+
+        function checkAnswer() {
+            const ans = document.getElementById('q-input').value.trim().toLowerCase();
+            const validAnswers = activeQuestions[currentQIndex].a;
+
+            if (validAnswers.includes(ans)) {
+                currentQIndex++;
+                if (currentQIndex < activeQuestions.length) {
+                    waitAndGo('p-quiz', loadQuestion);
+                } else {
+                    waitAndGo('p-game', () => {
+                        createHearts(15);
+                        initGame();
+                    });
+                }
+            } else {
+                document.getElementById('err-q').style.display = 'block';
+            }
+        }
+
+        function createHearts(amount) {
+            for (let i = 0; i < amount; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(heart);
+
+                    setTimeout(() => heart.remove(), 4000);
+                }, i * 150);
+            }
+        }
+
+        const symbols = ['🍌', '🍎', '🍇', '🍊', '🍓', '🍒', '🍍', '🍉'];
+        let cardsData = [...symbols, ...symbols];
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function initGame() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            flippedCards = [];
+            matchedPairs = 0;
+            cardsData.sort(() => 0.5 - Math.random());
+
+            cardsData.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.symbol = symbol;
+                card.dataset.index = index;
+                card.innerHTML = '?';
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
+                card.classList.add('flipped');
+                card.innerHTML = card.dataset.symbol;
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = flippedCards;
+            if (c1.dataset.symbol === c2.dataset.symbol) {
+                c1.classList.add('matched');
+                c2.classList.add('matched');
+                flippedCards = [];
+                matchedPairs++;
+
+                if (matchedPairs === 8) {
+                    setTimeout(() => {
+                        waitAndGo('p-final', () => {
+                            document.getElementById('user-name-display').innerText = currentUser;
+                            setInterval(() => createHearts(5), 500);
+                        });
+                    }, 800);
+                }
+            } else {
+                setTimeout(() => {
+                    c1.classList.remove('flipped');
+                    c2.classList.remove('flipped');
+                    c1.innerHTML = '?';
+                    c2.innerHTML = '?';
+                    flippedCards = [];
+                }, 800);
+            }
+        }
+    </script>
+</body>
+</html>
